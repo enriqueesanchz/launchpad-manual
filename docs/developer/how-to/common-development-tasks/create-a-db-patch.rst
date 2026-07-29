@@ -80,33 +80,7 @@ You need to run these steps whenever you make a schema change:
     ``database/schema/security.cfg``.
 11. **Run the full test suite to ensure that your new schema doesn't
     break any existing tests/code by side effect.**
-12. Commit without sample data changes, push and propose for merging to
-    ``db-devel`` if it's a cold patch or ``master`` if it's a hot patch.
-
-QA a database patch
-~~~~~~~~~~~~~~~~~~~
-
-To QA the patch, you will need to apply it and then check that things still
-work on staging.
-
-Cold patches
-^^^^^^^^^^^^
-
-* Wait until the branch reaches staging. Use the `db-stable deployment
-  report <https://deployable.ols.canonical.com/project/launchpad-db>`__
-  to check this.
-* After the branch reaches staging check the duration that the patch took to
-  be applied by reading the logs in ``launchpad-bastion-ps5`` as the
-  ``stg-launchpad`` user: ``less ~/logs/<date>-staging_restore.log``
-  If it took more than 15 seconds, mark the revision bad and revert it.
-
-Hot patches
-^^^^^^^^^^^
-
-* Manually apply the patch to qastaging: ssh into the db with write access
-  and apply the patch. Make sure to include the patch revision row to
-  ``LaunchpadDatabaseRevision`` so it does not get applied twice.
-
+12. :ref:`propose-a-db-patch`.
 
 Rules for patches
 -----------------
