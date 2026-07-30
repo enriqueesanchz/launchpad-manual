@@ -24,7 +24,8 @@ Cold patches
 * After the branch reaches staging check the duration that the patch took to
   be applied by reading the logs in ``launchpad-bastion-ps5`` as the
   ``stg-launchpad`` user: ``less ~/logs/<date>-staging_restore.log``
-  If it took more than 15 seconds, mark the revision bad and revert it.
+  If it took more than 15 seconds, mark the revision as non deployable and
+  revert it.
 * Check that things still work.
 
 Hot patches
@@ -43,9 +44,9 @@ In case it passed the QA, commit it without sample data changes, push and
 propose for merging to ``db-devel`` if it's a cold patch or ``master`` if
 it's a hot patch.
 
-* The schema change is approved for landing when you have an 'Approved'
-  vote from a DB reviewer (unless the reviewer in question explicitly
-  sets a higher barrier).
+The schema change is approved for landing when you have an 'Approved'
+vote from a DB reviewer (unless the reviewer in question explicitly
+sets a higher barrier).
 
 In case you're not member of ``~launchpad``, ask a member of the team to do
 these last steps for you:

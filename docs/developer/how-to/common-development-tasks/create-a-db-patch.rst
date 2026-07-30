@@ -43,7 +43,8 @@ You need to run these steps whenever you make a schema change:
    exact naming pattern. 
    
    Your patch should look like this:
-::
+
+  .. code-block:: SQL
 
    -- Copyright 2026 Canonical Ltd.  This software is licensed under the
    -- GNU Affero General Public License version 3 (see the file LICENSE).
@@ -55,15 +56,16 @@ You need to run these steps whenever you make a schema change:
    INSERT INTO LaunchpadDatabaseRevision VALUES (XXXX, YY, Z);
 
 4. Run your new SQL patch on the development database to ensure that it
-   works:: 
+   works:
+
+   .. code-block:: bash
+
        psql launchpad_dev -1 -f your-patch.sql
 5. Run ``make schema`` again and check that your patch gets applied. This
    is needed to allow the test suite see your changes.
 6. You may also wish to run ``make newsampledata``. Although it isn't
    critical, this lets you see what changes your patch would make to
-   initial setups.
-
-   - This will produce a lot of noise. Feel free to ignore it.
+   initial setups. This will produce a lot of noise. Feel free to ignore it.
 7. Review the sample data changes that occurred using ``git diff
    database/sampledata``. This diff can be hard to review as-is. You
    might want to use a graphical diff viewer like ``kompare`` or
@@ -71,15 +73,15 @@ You need to run these steps whenever you make a schema change:
    the changes you see.
 8. If you have added, removed or renamed a table or column, ensure that your
    patch includes appropriate ``COMMENT`` statements.
-9. **Run** ``make schema`` **again to ensure that it works, and that you now
-   have a pristine database with the new sample data.** If you don't
-   want to blow away your ``launchpad_dev`` database, then you can use
+9. Run ``make schema`` again to ensure that it works, and that you now
+   have a pristine database with the new sample data. If you don't
+   want to clean your ``launchpad_dev`` database, then you can use
    ``make -C database/schema test`` instead to update only the test
    databases.
 10. Make any necessary changes to ``database/schema/fti.py``,
     ``database/schema/security.cfg``.
-11. **Run the full test suite to ensure that your new schema doesn't
-    break any existing tests/code by side effect.**
+11. Run the full test suite to ensure that your new schema doesn't
+    break any existing tests/code by side effect.
 12. :ref:`propose-a-db-patch`.
 
 Rules for patches
@@ -121,8 +123,6 @@ sample data should be updated to match your schema changes.
 We have deprecated sample data. That means that you should never *add*
 new rows to the sample data.
 
-In fact, there are now two sets of sampledata that need to be updated.
-
 Sample data is used to provide well-known baseline data for the test
 suite, and to populate a developer's Launchpad instance so that
 ``launchpad.dev`` can display interesting stuff. Keep the following
@@ -147,14 +147,13 @@ used to create the new sample data, so you must run
 sample data. If in fact you do want the effects of your UI interactions
 to land in the new sample data, then the general process is to
 
--  run ``make schema``
--  interact with ``launchpad.dev``
--  follow the ``make newsampledata`` steps above.
+* run ``make schema``
+* interact with ``launchpad.dev``
+* run ``make newsampledata``
 
-**Be aware that if you generate new sample data, this will probably
-have an effect on tests not related to your changes!** For example, if
-you generate new karma events, you will break the ``karma_sample_data``
-tests because they expect all karma events to be dated prior to the year
-2002. If you make changes to the sample data, you **must** run the full
-test suite and ensure that you get no failures, otherwise there is a
-very high likelihood that you will break the trunk.
+.. note::
+  Be aware that if you generate new sample data, this will probably
+  have an effect on tests not related to your changes! If you make
+  changes to the sample data, you must run the full test suite
+  and ensure that you get no failures.
+
