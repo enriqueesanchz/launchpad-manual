@@ -1,6 +1,5 @@
 .. meta::
-   :description: Comprehensive step-by-step guide to propose a database
-      patch for deployment.
+   :description: Guide to proposing a Launchpad database patch for deployment.
 
 .. _propose-a-db-patch:
 
@@ -48,8 +47,8 @@ it's a hot patch.
   vote from a DB reviewer (unless the reviewer in question explicitly
   sets a higher barrier).
 
-In case you're not member of ``~launchpad``, a member of the team will do
-this for you:
+In case you're not member of ``~launchpad``, ask a member of the team to do
+these last steps for you:
 
 * Wait until there are **no** blockers to deploying the patch. One
   common blocker is having code changes made prior to the patch sitting

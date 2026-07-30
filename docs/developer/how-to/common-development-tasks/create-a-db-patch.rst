@@ -7,23 +7,21 @@
 Create a database patch
 =======================
 
-Background
-----------
 
-We change the schema through database patches. These live in branches
+Launchpad's schema is changed through database patches. These live in branches
 that go through review and landing, just like code changes.
 
-Schema patches are either applied while the system has no activity
-('cold patches') or while the system is under load ('hot patches'). Some
-things, like changing a table **and** adding an index, will need to be
-split into two separate patches - one hot and one cold.
+Schema patches can either be applied while the system has no activity
+(cold patches) or while the system is under load (hot patches). Changes such as
+changing a table **and** adding an index, must be split into two separate
+patches - one hot and one cold.
 
 See :ref:`database-patching` for more information about how cold/hot
 patching works.
 
 Schema patches must **not** be combined with changes to the Launchpad
 python code - any branch landing on devel or db-devel must be one or the
-other. Test \*only\* code may be included if absolutely necessary.
+other. **Test only** code may be included if absolutely necessary.
 Exceptions to this rule require approval from the project lead, because
 deploying them will require a 1 hour plus complete downtime window.
 
@@ -32,18 +30,19 @@ Making a database patch
 
 You need to run these steps whenever you make a schema change:
 
-1. Run ``make schema`` to get a pristine database of sample data.
+1. In your local development Launchpad instance, run ``make schema`` to get a pristine database of sample data.
 2. Add a patch number in `the dbpatches
    repository <https://code.launchpad.net/~launchpad/+git/dbpatches>`__.
-   If you are in ``~launchpad`` please allocate this yourself. Other
-   developers can ask any ~launchpad member to allocate a patch number for
+   If you are in the ``~launchpad`` team please allocate this yourself. Other
+   developers can ask any ``~launchpad`` member to allocate a patch number for
    them.
-   Commit and directly push to the main branch. No review is needed.
+   Commit and push directly to the main branch. No review is needed.
 3. Create a SQL file named ``patch-XXXX-YY-Z.sql`` in ``database/schema/``,
-   where ``XXXX-YY-Z`` is the patch number you allocated in the previous
+   where ``XXXX-YY-Z`` is the patch number allocated in the previous
    step. The schema application code only picks up files matching this
-   exact naming pattern. It should look like this:
-
+   exact naming pattern. 
+   
+   Your patch should look like this:
 ::
 
    -- Copyright 2026 Canonical Ltd.  This software is licensed under the
@@ -56,18 +55,19 @@ You need to run these steps whenever you make a schema change:
    INSERT INTO LaunchpadDatabaseRevision VALUES (XXXX, YY, Z);
 
 4. Run your new SQL patch on the development database to ensure that it
-   works. Do this by running ``psql launchpad_dev -1 -f your-patch.sql``
+   works:: 
+       psql launchpad_dev -1 -f your-patch.sql
 5. Run ``make schema`` again and check that your patch gets applied. This
    is needed to allow the test suite see your changes.
-6. You may wish to run ``make newsampledata``, although it isn't
-   critical; this will let you see what changes your patch would make to
+6. You may also wish to run ``make newsampledata``. Although it isn't
+   critical, this lets you see what changes your patch would make to
    initial setups.
 
    - This will produce a lot of noise. Feel free to ignore it.
 7. Review the sample data changes that occurred using ``git diff
    database/sampledata``. This diff can be hard to review as-is. You
    might want to use a graphical diff viewer like ``kompare`` or
-   ``meld`` which will make it easier. Make sure that you understand all
+   ``meld``. Make sure that you understand all
    the changes you see.
 8. If you have added, removed or renamed a table or column, ensure that your
    patch includes appropriate ``COMMENT`` statements.
@@ -85,8 +85,7 @@ You need to run these steps whenever you make a schema change:
 Rules for patches
 -----------------
 
-* To drop a table, use ``DROP TABLE`` as usual. Make sure that you drop or
-  update any dependent triggers, views and foreign keys before.
+* When dropping a table, make sure that you drop or update any dependent triggers, views and foreign keys beforehand.
 * Do not migrate data in schema patches unless the data size is
   extraordinarily small (< 100's of rows).
 * Similarly, new columns must default NULL unless the data size is
@@ -116,47 +115,43 @@ resolved **before landing the branch** that needs them.
 Sample data
 -----------
 
-Let's say your branch needs to make changes to the database schema. You
-need to follow the steps on this page to ensure that the sample data is
-updated to match your schema changes.
+If your branch needs to make changes to the database schema, the
+sample data should be updated to match your schema changes.
 
 We have deprecated sample data. That means that you should never *add*
 new rows to the sample data.
 
 In fact, there are now two sets of sampledata that need to be updated.
 
-We use sample data to provide well-known baseline data for the test
+Sample data is used to provide well-known baseline data for the test
 suite, and to populate a developer's Launchpad instance so that
-``launchpad.dev`` can display interesting stuff. There are some
-guidelines and recommendations you should be aware of before you make
+``launchpad.dev`` can display interesting stuff. Keep the following
+guidelines and recommendations in mind before you make
 changes to the test suite sample data, or you may break the tests for
 yourself or others.
 
-Please note that sample data is for developer's instances only. It would
-make no sense to use the sample data on production systems!
+Sample data is for developer's instances only and is of no use on production systems.
 
-If your tests require new data, you should create the data in your
-test's harness instead of adding new sample data. This will often make
-the tests themselves more readable because you're not relying on magical
-values in the sample database. Doing it this way also reduces the chance
-that your changes will break other tests by side-effect. Add the new
+If your tests require new data, create the data in your test's harness instead
+of adding new sample data. This often makes the tests themselves more readable.
+It also reduces the chance that your changes will break other tests. Add the new
 data in your test's ``setUp()`` or in the narrative of your doctest.
-Because the test suite uses the ``launchpad_ftest_template`` database,
+The test suite uses the ``launchpad_ftest_template`` database, so
 there is no chance that running the test suite will accidentally alter
 the sample data.
 
-However, if you interact with the web U/I for ``launchpad.dev`` your
+However, if you interact with the web UI for ``launchpad.dev`` your
 changes will end up in the ``launchpad_dev`` database. This database is
-used to create the new sample data, so it is imperative that you run
+used to create the new sample data, so you must run
 ``make schema`` to start with a pristine database before generating new
-sample data. If in fact you do want the effects of your u/i interactions
+sample data. If in fact you do want the effects of your UI interactions
 to land in the new sample data, then the general process is to
 
 -  run ``make schema``
 -  interact with ``launchpad.dev``
 -  follow the ``make newsampledata`` steps above.
 
-**Be aware though that your generation of new sample data will probably
+**Be aware that if you generate new sample data, this will probably
 have an effect on tests not related to your changes!** For example, if
 you generate new karma events, you will break the ``karma_sample_data``
 tests because they expect all karma events to be dated prior to the year
