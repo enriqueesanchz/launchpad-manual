@@ -54,7 +54,6 @@ required to implement and ship changes in Launchpad.
   :ref:`Journey of a change to production <journey-change-production>`
 * **Database changes**:
   :ref:`Create a database patch <create-a-db-patch>` •
-  :ref:`Propose a database patch for deployment <propose-a-db-patch>` •
   :ref:`Apply database schema changes <apply-database-schema-changes>`
 * **Common tasks**:
   :ref:`Fix bugs <fixing-bugs>` •

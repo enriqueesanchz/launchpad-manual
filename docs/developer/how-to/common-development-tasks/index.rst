@@ -15,7 +15,6 @@ through the conventions you should follow as a Launchpad developer.
    contributing-changes
    use-updated-dependency
    create-a-db-patch
-   propose-a-db-patch
    apply-schema-changes
    importing-an-ubuntu-package
    

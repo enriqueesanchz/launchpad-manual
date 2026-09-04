@@ -12,15 +12,17 @@ that go through review and landing, just like code changes.
 
 Schema patches can either be applied while the system has deliberately been brought down
 (cold patches) or while the system is up and actively being used (hot patches). Changes such as
-changing a table **and** adding an index, must be split into two separate
-patches - one hot and one cold.
+updating a table, which will be affected by ongoing activity, **and** adding an index,
+which can be done without affecting behavior of the system, must be split into two separate
+patches — one cold and one hot.
 
 See :ref:`database-patching` for more information about how cold/hot
 patching works.
 
 Schema patches must **not** be combined with changes to the Launchpad
-python code - any branch landing on devel or db-devel must be one or the
-other. **Test only** code may be included if absolutely necessary.
+python code — any branch landing on the devel or db-devel must either be a schema patch
+or be a code change.
+**Test only** code may be included if absolutely necessary.
 Exceptions to this rule require approval from the project lead, because
 deploying them will require a 1 hour+ complete downtime window.
 
@@ -81,11 +83,40 @@ You need to run these steps whenever you make a schema change:
     ``database/schema/security.cfg``.
 11. Run the full test suite to ensure that your new schema doesn't
     accidentally break any existing tests/code.
-12. :ref:`propose-a-db-patch`.
+12. Propose the patch for deployment
+
+Propose a database patch for deployment
+---------------------------------------
+
+Before deploying a database patch, you need to make sure it applies cleanly
+and things keep working. It also needs to pass the performance requirements.
+Ask a member of ``~launchpad`` will need to QA it.
+
+Ask for a deployment
+~~~~~~~~~~~~~~~~~~~~
+
+Commit it without sample data changes, then push and propose for merging to
+``db-devel`` if it's a cold patch or ``master`` if it's a hot patch.
+
+The schema change is approved for landing when you have an 'Approved'
+vote from a DB reviewer (unless the reviewer in question explicitly
+sets a higher barrier).
+
+In case you're not a member of ``~launchpad``, ask a member of the team to do
+these last steps for you:
+
+* QA the patch. Make sure cold patches do not take more than a few seconds to apply.
+* Wait until there are **no** blockers to deploying the patch. One
+  common blocker is having code changes made prior to the patch sitting
+  in stable and not yet deployed to all affected service instances.
+* Request a deployment per the internal `production change
+  process <https://canonical-launchpad-admin-manual.readthedocs-hosted.com/en/latest/howto/launchpad-rollout/launchpad-deployments/production-change-processes/>`__.
+
 
 Rules for patches
 -----------------
 
+* Operations that claim locks on tables should be done using ``CONCURRENTLY``.
 * When dropping a table, make sure that you drop or update any dependent triggers, views and foreign keys beforehand.
 * Do not migrate data in schema patches unless the data size is
   extraordinarily small (< 100s of rows).

@@ -229,3 +229,4 @@ user/HelpText/ProjectOverview/DOAP user/
 user/HelpOnUpdating user/
 user/how-to/work-with-bazaar/create-and-publish-branches/ user/explanation/working-with-code/
 developer/how-to/porting-builders-to-newer-ubuntu-versions/ developer/
+developer/how-to/common-development-tasks/database-schema-changes-process/ developer/how-to/common-development-tasks/create-a-db-patch
