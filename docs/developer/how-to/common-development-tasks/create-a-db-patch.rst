@@ -83,19 +83,10 @@ You need to run these steps whenever you make a schema change:
     ``database/schema/security.cfg``.
 11. Run the full test suite to ensure that your new schema doesn't
     accidentally break any existing tests/code.
-12. Propose the patch for deployment
 
-Propose a database patch for deployment
----------------------------------------
+Propose your patch for deployment
 
-Before deploying a database patch, you need to make sure it applies cleanly
-and things keep working. It also needs to pass the performance requirements.
-Ask a member of ``~launchpad`` will need to QA it.
-
-Ask for a deployment
-~~~~~~~~~~~~~~~~~~~~
-
-Commit it without sample data changes, then push and propose for merging to
+Commit your patch without sample data changes, then push and propose for merging to
 ``db-devel`` if it's a cold patch or ``master`` if it's a hot patch.
 
 The schema change is approved for landing when you have an 'Approved'
@@ -105,7 +96,7 @@ sets a higher barrier).
 In case you're not a member of ``~launchpad``, ask a member of the team to do
 these last steps for you:
 
-* QA the patch. Make sure cold patches do not take more than a few seconds to apply.
+* QA the patch to confirm it applies cleanly and meets performance requirements. Make sure cold patches do not take more than a few seconds to apply.
 * Wait until there are **no** blockers to deploying the patch. One
   common blocker is having code changes made prior to the patch sitting
   in stable and not yet deployed to all affected service instances.
