@@ -7,12 +7,11 @@
 Create a database patch
 =======================
 
-
 Launchpad's schema is changed through database patches. These live in branches
 that go through review and landing, just like code changes.
 
-Schema patches can either be applied while the system has no activity
-(cold patches) or while the system is under load (hot patches). Changes such as
+Schema patches can either be applied while the system has deliberately been brought down
+(cold patches) or while the system is up and actively being used (hot patches). Changes such as
 changing a table **and** adding an index, must be split into two separate
 patches - one hot and one cold.
 
@@ -23,7 +22,7 @@ Schema patches must **not** be combined with changes to the Launchpad
 python code - any branch landing on devel or db-devel must be one or the
 other. **Test only** code may be included if absolutely necessary.
 Exceptions to this rule require approval from the project lead, because
-deploying them will require a 1 hour plus complete downtime window.
+deploying them will require a 1 hour+ complete downtime window.
 
 Making a database patch
 -----------------------
@@ -62,7 +61,7 @@ You need to run these steps whenever you make a schema change:
 
        psql launchpad_dev -1 -f your-patch.sql
 5. Run ``make schema`` again and check that your patch gets applied. This
-   is needed to allow the test suite see your changes.
+   is needed to allow the test suite to see your changes.
 6. You may also wish to run ``make newsampledata``. Although it isn't
    critical, this lets you see what changes your patch would make to
    initial setups. This will produce a lot of noise. Feel free to ignore it.
@@ -81,7 +80,7 @@ You need to run these steps whenever you make a schema change:
 10. Make any necessary changes to ``database/schema/fti.py``,
     ``database/schema/security.cfg``.
 11. Run the full test suite to ensure that your new schema doesn't
-    break any existing tests/code by side effect.
+    accidentally break any existing tests/code.
 12. :ref:`propose-a-db-patch`.
 
 Rules for patches
@@ -89,9 +88,9 @@ Rules for patches
 
 * When dropping a table, make sure that you drop or update any dependent triggers, views and foreign keys beforehand.
 * Do not migrate data in schema patches unless the data size is
-  extraordinarily small (< 100's of rows).
+  extraordinarily small (< 100s of rows).
 * Similarly, new columns must default NULL unless the data size is
-  extraordinarily small (< 100's of rows).
+  extraordinarily small (< 100s of rows).
 * When changing existing DB functions, start your patch with the
   original version (``SELECT pg_get_functiondef(oid) FROM pg_proc WHERE
   proname IN ('foofunc', 'barfunc') ORDER BY proname;``). This makes it
@@ -110,7 +109,7 @@ a role entirely), must be landed on ``db-devel`` and deployed during a
 fast-downtime deployment. This is because a full update (including revocation)
 requires resetting all permissions, which cannot be done without downtime.
 
-Note that adding new roles requires manual DB reconfiguration, so you need to
+Adding new roles requires manual DB reconfiguration, so you need to
 file a ticket to grant access to relevant machines and make sure it is
 resolved **before landing the branch** that needs them.
 
@@ -120,12 +119,11 @@ Sample data
 If your branch needs to make changes to the database schema, the
 sample data should be updated to match your schema changes.
 
-We have deprecated sample data. That means that you should never *add*
-new rows to the sample data.
+Never *add* new rows to the sample data.
 
 Sample data is used to provide well-known baseline data for the test
 suite, and to populate a developer's Launchpad instance so that
-``launchpad.dev`` can display interesting stuff. Keep the following
+``launchpad.test`` can display interesting stuff. Keep the following
 guidelines and recommendations in mind before you make
 changes to the test suite sample data, or you may break the tests for
 yourself or others.
@@ -153,7 +151,7 @@ to land in the new sample data, then the general process is to
 
 .. note::
   Be aware that if you generate new sample data, this will probably
-  have an effect on tests not related to your changes! If you make
+  have an effect on tests not related to your changes. If you make
   changes to the sample data, you must run the full test suite
   and ensure that you get no failures.
 
